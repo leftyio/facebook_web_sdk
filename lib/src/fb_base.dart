@@ -2,18 +2,12 @@
 library facebook;
 
 import 'dart:async';
-import 'dart:html';
+
+import 'package:dart_browser_loader/dart_browser_loader.dart';
 import 'package:js/js.dart';
 
 void addFacebookScript() {
-  final script = document.getElementsByTagName('script')[0];
-  if (document.getElementById('facebook-jssdk') != null) {
-    return;
-  }
-  final js = new ScriptElement()
-    ..src = '//connect.facebook.net/en_US/sdk.js'
-    ..id = 'facebook-jssdk';
-  script.parentNode.insertBefore(js, script);
+  loadScript('//connect.facebook.net/en_US/sdk.js', id: 'facebook-jssdk');
 }
 
 @JS('fbAsyncInit')
@@ -29,8 +23,11 @@ Future<Null> fbAsyncInit() {
 @anonymous
 class FbInitOption {
   external String get appId;
+
   external bool get cookies;
+
   external bool get xfbml;
+
   external String get version;
 
   external factory FbInitOption(
@@ -47,8 +44,11 @@ external void init(FbInitOption option);
 @anonymous
 class JsAuthResponse {
   external String get accessToken;
+
   external String get expiresIn;
+
   external String get signedRequest;
+
   external String get userID;
 
   external factory JsAuthResponse(
@@ -62,6 +62,7 @@ class JsAuthResponse {
 @anonymous
 class JsLoginStatusResponse {
   external String get status;
+
   external JsAuthResponse get authResponse;
 
   external factory JsLoginStatusResponse(
