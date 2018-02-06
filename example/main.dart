@@ -7,7 +7,7 @@ Future<Null> main() async {
   await fbAsyncInit();
   init(
     new FbInitOption(
-      appId: '668533529958152',
+      appId: 'YOUR_APP_ID',
       cookies: true,
       xfbml: true,
       version: 'v2.9',
