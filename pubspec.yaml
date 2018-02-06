@@ -1,6 +1,9 @@
 name: fb
 description: basic facebook wrap for dart
 version: 0.0.1
+homepage: https://lefty.io
+author: Kevin Segaud <kevin.segaud@gmail.com>
+
 
 environment:
   sdk: '>=1.20.1 <2.0.0'
