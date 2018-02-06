@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:fb/fb.dart';
+import 'package:facebook/facebook.dart';
 
 Future<Null> main() async {
   addFacebookScript();
