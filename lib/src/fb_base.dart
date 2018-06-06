@@ -14,7 +14,7 @@ void addFacebookScript() {
 external set _fbAsyncInit(Function function);
 
 Future<Null> fbAsyncInit() {
-  final completer = new Completer();
+  final completer = new Completer<Null>();
   _fbAsyncInit = allowInterop(completer.complete);
   return completer.future;
 }
@@ -145,3 +145,13 @@ Future<LoginStatusResponse> login([List<String> scopes]) {
   }), new JsScope(scope: scopes.join(",")));
   return completer.future;
 }
+
+@JS('FB.logout')
+external void _logout(Function f);
+
+Future<void> logout() {
+  final completer = new Completer();
+  _logout(allowInterop(completer.complete));
+  return completer.future;
+}
+
