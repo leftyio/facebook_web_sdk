@@ -139,7 +139,7 @@ external void _login(Function f, JsScope scope);
 
 Future<LoginStatusResponse> login([List<String> scopes]) {
   scopes ??= ['public_profile'];
-  final completer = new Completer();
+  final completer = new Completer<LoginStatusResponse>();
   _login(allowInterop((JsLoginStatusResponse response) {
     completer.complete(new LoginStatusResponse.fromJsObject(response));
   }), new JsScope(scope: scopes.join(",")));
