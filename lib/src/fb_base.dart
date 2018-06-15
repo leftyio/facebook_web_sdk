@@ -13,8 +13,8 @@ void addFacebookScript() {
 @JS('fbAsyncInit')
 external set _fbAsyncInit(Function function);
 
-Future<Null> fbAsyncInit() {
-  final completer = new Completer<Null>();
+Future<void> fbAsyncInit() {
+  final completer = new Completer<void>();
   _fbAsyncInit = allowInterop(completer.complete);
   return completer.future;
 }
@@ -119,7 +119,7 @@ class LoginStatusResponse {
 external void _getLoginStatus(Function f);
 
 Future<LoginStatusResponse> getLoginStatus() {
-  final completer = new Completer();
+  final completer = new Completer<LoginStatusResponse>();
   _getLoginStatus(allowInterop((JsLoginStatusResponse response) {
     completer.complete(new LoginStatusResponse.fromJsObject(response));
   }));
