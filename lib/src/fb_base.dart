@@ -154,4 +154,3 @@ Future<void> logout() {
   _logout(allowInterop(completer.complete));
   return completer.future;
 }
-
