@@ -95,6 +95,9 @@ class ShareDialogParams implements UiParams {
   });
 }
 
+@JS('FB.getAuthResponse')
+external JsLoginStatusResponse getAuthResponse();
+
 @JS()
 @anonymous
 class UiResponseData {
