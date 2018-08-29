@@ -91,6 +91,10 @@ Future<void> logout() {
   return completer.future;
 }
 
+/// The Share dialog gives people the ability to publish an individual story to their timeline,
+/// a friend's timeline, a group, or in a private message on Messenger.
+/// This does not require Facebook Login or any extended permissions,
+/// so it is the easiest way to enable sharing on the web.
 Future<base.UiResponseData> uiShareDialog(
     {String href,
     String hastag,
