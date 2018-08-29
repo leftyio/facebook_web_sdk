@@ -1,5 +1,5 @@
 name: facebook_web_sdk
-description: basic facebook js sdk wrap for dart
+description: Facebook js sdk wrap for dart
 version: 0.0.6
 homepage: https://lefty.io
 author: Kevin Segaud <kevin.segaud@gmail.com>

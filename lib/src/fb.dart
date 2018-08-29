@@ -14,6 +14,8 @@ Future<void> fbAsyncInit() {
   return completer.future;
 }
 
+/// Used to initialize and setup the SDK.
+/// All other SDK methods must be called after this one.
 void init(base.FbInitOption option) => base.init(option);
 
 class AuthResponse {
@@ -62,6 +64,7 @@ class LoginStatusResponse {
             : null;
 }
 
+/// Returns the Facebook Login status of a user, with an [LoginStatusResponse] object if they are logged in.
 Future<LoginStatusResponse> getLoginStatus() {
   final completer = new Completer<LoginStatusResponse>();
   base.getLoginStatus(allowInterop((base.JsLoginStatusResponse response) {
@@ -70,6 +73,8 @@ Future<LoginStatusResponse> getLoginStatus() {
   return completer.future;
 }
 
+/// Prompts a user to login to your app using the Login dialog in a popup.
+/// This method can also be used with an already logged-in user to request additional permissions from them.
 Future<LoginStatusResponse> login([List<String> scopes]) {
   scopes ??= ['public_profile'];
   final completer = new Completer<LoginStatusResponse>();
@@ -79,6 +84,7 @@ Future<LoginStatusResponse> login([List<String> scopes]) {
   return completer.future;
 }
 
+/// Used to logout the current user both from your site or app and from Facebook.com.
 Future<void> logout() {
   final completer = new Completer();
   base.logout(allowInterop(completer.complete));
