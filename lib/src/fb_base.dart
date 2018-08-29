@@ -1,23 +1,10 @@
 @JS('window')
 library facebook;
 
-import 'dart:async';
-
-import 'package:dart_browser_loader/dart_browser_loader.dart';
 import 'package:js/js.dart';
 
-void addFacebookScript() {
-  loadScript('//connect.facebook.net/en_US/sdk.js', id: 'facebook-jssdk');
-}
-
 @JS('fbAsyncInit')
-external set _fbAsyncInit(Function function);
-
-Future<void> fbAsyncInit() {
-  final completer = new Completer<void>();
-  _fbAsyncInit = allowInterop(completer.complete);
-  return completer.future;
-}
+external set fbAsyncInit(Function function);
 
 @JS()
 @anonymous
@@ -69,62 +56,8 @@ class JsLoginStatusResponse {
       {String status, JsAuthResponse authResponse});
 }
 
-class AuthResponse {
-  final String accessToken;
-  final String expiresIn;
-  final String signedRequest;
-  final String userID;
-
-  AuthResponse.fromJsObject(JsAuthResponse jsObject)
-      : accessToken = jsObject.accessToken,
-        expiresIn = jsObject.expiresIn,
-        signedRequest = jsObject.signedRequest,
-        userID = jsObject.userID;
-}
-
-enum LoginStatus {
-  connected,
-  notAuthorized,
-  unknown,
-}
-
-LoginStatus _stringToLoginStatus(String status) {
-  switch (status) {
-    case 'connected':
-      return LoginStatus.connected;
-    case 'not_authorized':
-      return LoginStatus.notAuthorized;
-    case 'unknown':
-      return LoginStatus.unknown;
-    default:
-      return LoginStatus.unknown;
-  }
-}
-
-class LoginStatusResponse {
-  final LoginStatus status;
-  final AuthResponse authResponse;
-
-  LoginStatusResponse(String status, this.authResponse)
-      : status = _stringToLoginStatus(status);
-
-  LoginStatusResponse.fromJsObject(JsLoginStatusResponse jsObject)
-      : status = _stringToLoginStatus(jsObject.status),
-        authResponse = jsObject.authResponse != null
-            ? new AuthResponse.fromJsObject(jsObject.authResponse)
-            : null;
-}
-
 @JS('FB.getLoginStatus')
-external void _getLoginStatus(Function f);
-
-Future<LoginStatusResponse> getLoginStatus() {
-  final completer = new Completer<LoginStatusResponse>();
-  _getLoginStatus(allowInterop((JsLoginStatusResponse response) {
-    completer.complete(new LoginStatusResponse.fromJsObject(response));
-  }));
-  return completer.future;
-}
+external void getLoginStatus(Function f);
 
 @JS()
 @anonymous
@@ -135,22 +68,38 @@ class JsScope {
 }
 
 @JS('FB.login')
-external void _login(Function f, JsScope scope);
-
-Future<LoginStatusResponse> login([List<String> scopes]) {
-  scopes ??= ['public_profile'];
-  final completer = new Completer<LoginStatusResponse>();
-  _login(allowInterop((JsLoginStatusResponse response) {
-    completer.complete(new LoginStatusResponse.fromJsObject(response));
-  }), new JsScope(scope: scopes.join(",")));
-  return completer.future;
-}
+external void login(Function f, JsScope scope);
 
 @JS('FB.logout')
-external void _logout(Function f);
+external void logout(Function f);
 
-Future<void> logout() {
-  final completer = new Completer();
-  _logout(allowInterop(completer.complete));
-  return completer.future;
+abstract class UiParams {
+  String get method;
 }
+
+@JS()
+@anonymous
+class ShareDialogParams implements UiParams {
+  external String get method;
+  external String get href;
+  external String get hashtag;
+  external String get quote;
+  external bool get mobile_iframe;
+
+  external factory ShareDialogParams({
+    String method = 'share',
+    String href,
+    String hashtag,
+    String quote,
+    bool mobile_iframe = false,
+  });
+}
+
+@JS()
+@anonymous
+class UiResponseData {
+  external String get errorMessage;
+}
+
+@JS('FB.ui')
+external void ui(params, Function f);
