@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:js';
 
 import 'package:dart_browser_loader/dart_browser_loader.dart';
+
 import 'fb_base.dart' as base;
 
 void addFacebookScript({String lang = 'en_US'}) {
@@ -11,81 +12,6 @@ void addFacebookScript({String lang = 'en_US'}) {
 Future<void> fbAsyncInit() {
   final completer = new Completer<void>();
   base.fbAsyncInit = allowInterop(completer.complete);
-  return completer.future;
-}
-
-/// The method [init] is used to initialize and setup the SDK.
-/// If you have followed our SDK quickstart guide,
-/// you won't need to re-use this method,
-/// but you may want to customize the parameters used.
-///
-/// https://developers.facebook.com/docs/javascript/reference/FB.init/v3.1
-void init(base.FbInitOption option) => base.init(option);
-
-class AuthResponse {
-  final String accessToken;
-  final String expiresIn;
-  final String signedRequest;
-  final String userID;
-
-  AuthResponse.fromJsObject(base.JsAuthResponse jsObject)
-      : accessToken = jsObject.accessToken,
-        expiresIn = jsObject.expiresIn,
-        signedRequest = jsObject.signedRequest,
-        userID = jsObject.userID;
-}
-
-enum LoginStatus {
-  connected,
-  notAuthorized,
-  authorizationExpired,
-  unknown,
-}
-
-LoginStatus _stringToLoginStatus(String status) {
-  switch (status) {
-    case 'connected':
-      return LoginStatus.connected;
-    case 'not_authorized':
-      return LoginStatus.notAuthorized;
-    case 'authorization_expired':
-      return LoginStatus.authorizationExpired;
-    case 'unknown':
-      return LoginStatus.unknown;
-    default:
-      return LoginStatus.unknown;
-  }
-}
-
-class LoginStatusResponse {
-  final LoginStatus status;
-  final AuthResponse authResponse;
-
-  LoginStatusResponse(String status, this.authResponse)
-      : status = _stringToLoginStatus(status);
-
-  LoginStatusResponse.fromJsObject(base.JsLoginStatusResponse jsObject)
-      : status = _stringToLoginStatus(jsObject.status),
-        authResponse = jsObject.authResponse != null
-            ? new AuthResponse.fromJsObject(jsObject.authResponse)
-            : null;
-}
-
-/// [getLoginStatus] allows you to determine if a user is logged in to Facebook and has authenticated your app.
-/// There are four possible states for a user:
-
-/// The user is logged into Facebook and has authorized your application. [LoginStatus.connected]
-/// The user has previously logged into your application but your authorization to access their data has expired. [LoginStatus.authorizationExpired]
-/// The user is logged into Facebook but has not authorized your application. [LoginStatus.notAuthorized]
-/// The user is either not logged into Facebook or explicitly logged out of your application so it doesn't attempt to connect to Facebook and thus, we don't know if they've authenticated your application or not. [LoginStatus.unknown]
-/// Knowing which of the these three states the user is in is one of the first things your application needs to know on page load.
-///
-/// https://developers.facebook.com/docs/reference/javascript/FB.getLoginStatus/
-Future<LoginStatusResponse> getLoginStatus() {
-  final completer = new Completer<LoginStatusResponse>();
-  base.getLoginStatus(allowInterop((base.JsLoginStatusResponse response) {
-    completer.complete(new LoginStatusResponse.fromJsObject(response));
-  }));
   return completer.future;
 }
 
@@ -99,6 +25,32 @@ Future<LoginStatusResponse> getLoginStatus() {
 /// https://developers.facebook.com/docs/reference/javascript/FB.getAuthResponse/
 base.JsLoginStatusResponse getAuthResponse() => base.getAuthResponse();
 
+/// [getLoginStatus] allows you to determine if a user is logged in to Facebook and has authenticated your app.
+/// There are four possible states for a user:
+
+/// The user is logged into Facebook and has authorized your application. [LoginStatus.connected]
+/// The user has previously logged into your application but your authorization to access their data has expired. [LoginStatus.authorizationExpired]
+/// The user is logged into Facebook but has not authorized your application. [LoginStatus.notAuthorized]
+/// The user is either not logged into Facebook or explicitly logged out of your application so it doesn't attempt to connect to Facebook and thus, we don't know if they've authenticated your application or not. [LoginStatus.unknown]
+/// Knowing which of the these three states the user is in is one of the first things your application needs to know on page load.
+///
+/// https://developers.facebook.com/docs/reference/javascript/FB.getLoginStatus/
+Future<LoginStatusResponse> getLoginStatus() {
+  final completer = new Completer<LoginStatusResponse>();
+  base.getLoginStatus(allowInterop<GetLoginStatusFunction>((response) {
+    completer.complete(new LoginStatusResponse.fromJsObject(response));
+  }));
+  return completer.future;
+}
+
+/// The method [init] is used to initialize and setup the SDK.
+/// If you have followed our SDK quickstart guide,
+/// you won't need to re-use this method,
+/// but you may want to customize the parameters used.
+///
+/// https://developers.facebook.com/docs/javascript/reference/FB.init/v3.1
+void init(base.FbInitOption option) => base.init(option);
+
 /// Prompts a user to login to your app using the Login dialog in a popup.
 /// This method can also be used with an already logged-in user to request additional permissions from them.
 ///
@@ -106,13 +58,13 @@ base.JsLoginStatusResponse getAuthResponse() => base.getAuthResponse();
 Future<LoginStatusResponse> login([List<String> scopes]) {
   scopes ??= ['public_profile'];
   final completer = new Completer<LoginStatusResponse>();
-  base.login(allowInterop((base.JsLoginStatusResponse response) {
+  base.login(allowInterop<GetLoginStatusFunction>((response) {
     completer.complete(new LoginStatusResponse.fromJsObject(response));
-  }), new base.JsScope(scope: scopes.join(",")));
+  }), new base.JsScope(scope: scopes.join(',')));
   return completer.future;
 }
 
-/// The method [ogout] logs the user out of your site and, in some cases, Facebook.
+/// The method [logout] logs the user out of your site and, in some cases, Facebook.
 ///
 /// Consider the 3 scenarios below:
 ///
@@ -141,4 +93,55 @@ Future<base.UiResponseData> uiShareDialog(
     allowInterop(completer.complete),
   );
   return completer.future;
+}
+
+LoginStatus _stringToLoginStatus(String status) {
+  switch (status) {
+    case 'connected':
+      return LoginStatus.connected;
+    case 'not_authorized':
+      return LoginStatus.notAuthorized;
+    case 'authorization_expired':
+      return LoginStatus.authorizationExpired;
+    case 'unknown':
+      return LoginStatus.unknown;
+    default:
+      return LoginStatus.unknown;
+  }
+}
+
+typedef void GetLoginStatusFunction(base.JsLoginStatusResponse response);
+
+class AuthResponse {
+  final String accessToken;
+  final String expiresIn;
+  final String signedRequest;
+  final String userID;
+
+  AuthResponse.fromJsObject(base.JsAuthResponse jsObject)
+      : accessToken = jsObject.accessToken,
+        expiresIn = jsObject.expiresIn,
+        signedRequest = jsObject.signedRequest,
+        userID = jsObject.userID;
+}
+
+enum LoginStatus {
+  connected,
+  notAuthorized,
+  authorizationExpired,
+  unknown,
+}
+
+class LoginStatusResponse {
+  final LoginStatus status;
+  final AuthResponse authResponse;
+
+  LoginStatusResponse(String status, this.authResponse)
+      : status = _stringToLoginStatus(status);
+
+  LoginStatusResponse.fromJsObject(base.JsLoginStatusResponse jsObject)
+      : status = _stringToLoginStatus(jsObject.status),
+        authResponse = jsObject.authResponse != null
+            ? new AuthResponse.fromJsObject(jsObject.authResponse)
+            : null;
 }
